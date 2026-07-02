@@ -4,25 +4,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import MenuLink from "./MenuLink";
-// import LogoutButton from "../LogoutButton";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import useSignupModal from "@/app/hooks/useSignupModal";
 
-// import useLoginModal from "@/app/hooks/useLoginModal";
-// import useSignupModal from "@/app/hooks/useSignupModal";
-
-interface UserNavProps {
-    userId?: string | null;
-}
-
-const UserNav: React.FC<UserNavProps> = ({
-    userId
+const UserNav = ({
 }) => {
     const router = useRouter();
-    // const loginModal = useLoginModal();
-    // const signupModal = useSignupModal();
     const [isOpen, setIsOpen] = useState(false)
 
-    console.log('asdf', userId)
-
+    const loginModal = useLoginModal();
+    const signupModal = useSignupModal();
     return (
         <div className="p-2 relative inline-block border border-gray-200 rounded-full">
             <button 
@@ -40,8 +31,8 @@ const UserNav: React.FC<UserNavProps> = ({
 
             {isOpen && (
                 <div className="w-[220px] absolute top-[60px] right-0 bg-white border border-gray-200 rounded-xl shadow-md flex flex-col cursor-pointer">
-                    {userId ? (
-                        <>
+                    
+                        {/* <>
                             <MenuLink
                                 label='Inbox'
                                 onClick={() => {
@@ -74,15 +65,15 @@ const UserNav: React.FC<UserNavProps> = ({
                                 }}
                             />
 
-                            {/* <LogoutButton /> */}
-                        </>
-                    ) : (
+                            <LogoutButton />
+                        </> */}
+                   
                         <>
                             <MenuLink 
                                 label='Log in'
                                 onClick={() => {
                                     setIsOpen(false);
-                                    // loginModal.open();
+                                    loginModal.open();
                                 }}
                             />
 
@@ -90,11 +81,11 @@ const UserNav: React.FC<UserNavProps> = ({
                                 label='Sign up'
                                 onClick={() => {
                                     setIsOpen(false);
-                                    // signupModal.open();
+                                    signupModal.open();
                                 }}
                             />
                         </>
-                    )}
+                  
                 </div>
             )}
         </div>
