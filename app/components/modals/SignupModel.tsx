@@ -1,50 +1,92 @@
-'use client'
+'use client';
 
-import useSignupModal from "@/app/hooks/useSignupModal";
-import CustomButton from "../forms/CustomButton";
 import Modal from "./modals";
 
-const SignupModal = () => {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import useSignupModal from "@/app/hooks/useSignupModal";
+import CustomButton from "../forms/CustomButton";
+import apiService from "@/app/services/apiService";
+import { handleLogin } from "../../lib/action";
 
+const SignupModal = () => {
+    //
+    // Variables
+
+    const router = useRouter();
     const signupModal = useSignupModal();
+    const [email, setEmail] = useState('');
+    const [password1, setPassword1] = useState('');
+    const [password2, setPassword2] = useState('');
+    const [errors, setErrors] = useState<string[]>([]);
+
+    //
+    // Submit functionality
+
+    const submitSignup = async () => {
+        const formData = {
+            name: "",   
+            email: email,
+            password1: password1,
+            password2: password2
+        }
+
+        const response = await apiService.postWithoutToken('/api/auth/register/', JSON.stringify(formData));
+
+        if (response.access) {
+            handleLogin(response.user.pk, response.access, response.refresh);
+
+            signupModal.close();
+
+            router.push('/')
+        } else {
+            const tmpErrors: string[] = Object.values(response).map((error: any) => {
+                return error;
+            })
+
+            setErrors(tmpErrors);
+        }
+    }
 
     const content = (
         <>
-            <div className=" ">
-                <p className="text-sm text-center text-gray-500">Welcome back! Please enter your details.</p>
-                <form action="" className="">
-                    <input type="text" placeholder="Email" className="m-2 border border-gray-300 rounded-md p-2 w-full" />
-                    <input type="password" placeholder="Password" className="m-2 border border-gray-300 rounded-md p-2 w-full" />
-                    <input type="password" placeholder="Confirm Password" className="m-2 border border-gray-300 rounded-md p-2 w-full" />
+            <form
+                action={submitSignup}
+                className="space-y-4"
+            >
+                <input onChange={(e) => setEmail(e.target.value)} placeholder="Your e-mail address" type="email" className="w-full h-[54px] px-4 border border-gray-300 rounded-xl" />
 
-                    <CustomButton
-                        label={"Signup"}
-                        onClick={() => {
-                            signupModal.close();
-                        }}
+                <input onChange={(e) => setPassword1(e.target.value)} placeholder="Your password" type="password" className="w-full h-[54px] px-4 border border-gray-300 rounded-xl" />
 
-                    />
+                <input onChange={(e) => setPassword2(e.target.value)} placeholder="Repeat password" type="password" className="w-full h-[54px] px-4 border border-gray-300 rounded-xl" />
 
-                </form>
-            </div>
+                {errors.map((error, index) => {
+                    return (
+                        <div
+                            key={`error_${index}`}
+                            className="p-5 bg-red-600 text-white rounded-xl opacity-80"
+                        >
+                            {error}
+                        </div>
+                    )
+                })}
 
-
+                <CustomButton
+                    label="Submit"
+                    onClick={submitSignup}
+                />
+            </form>
         </>
-
-
     )
 
     return (
-        <>
-            <Modal
-                label={"Signup"}
-                close={signupModal.close}
-                content={content}
-                isOpen={signupModal.isOpen}
-            />
-        </>
+        <Modal
+            isOpen={signupModal.isOpen}
+            close={signupModal.close}
+            label="Sign up"
+            content={content}
+        />
     )
-
 }
 
-export default SignupModal
+export default SignupModal;

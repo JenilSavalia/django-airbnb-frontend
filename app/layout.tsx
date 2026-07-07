@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "./components/navbar/Navbar";
 import LoginModal from "./components/modals/LoginModel";
 import SignupModal from "./components/modals/SignupModel";
+import AddPropertyModal from "./components/modals/AddPropertyModel";
+import SearchModal from "./components/modals/SearchModel";
 
 
 export const metadata: Metadata = {
@@ -27,6 +29,8 @@ export default function RootLayout({
 
         <LoginModal />
         <SignupModal />
+        <AddPropertyModal/>
+        <SearchModal/>
       </body>
     </html>
   );

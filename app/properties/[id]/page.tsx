@@ -1,17 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import ReservationSidebar from "@/app/components/properties/ReservationSidebar";
-import beach from "../../../public/beach_1.jpg";
 
-const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
+import apiService from "@/app/services/apiService";
+import { getUserId } from "../../lib/action";
 
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+
+const PropertyDetailPage = async ({ params }: PageProps) => {
+
+    const resolvedParams = await params;
+
+
+    const property = await apiService.get(`/api/properties/${resolvedParams.id}`);
+    const userId = await getUserId();
+
+    console.log('userId', userId);
 
     return (
-        <main className="w-full mx-auto px-6 pb-6">
+        <main className="max-w-[1500px] mx-auto px-6 pb-6">
             <div className="w-full h-[64vh] mb-4 overflow-hidden rounded-xl relative">
                 <Image
                     fill
-                    src={beach}
+                    src={property.image_url}
                     className="object-cover w-full h-full"
                     alt="Beach house"
                 />
@@ -19,34 +33,42 @@ const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="py-6 pr-6 col-span-3">
-                    <h1 className="mb-4 text-4xl">Property Title</h1>
+                    <h1 className="mb-4 text-4xl">{property.title}</h1>
 
                     <span className="mb-6 block text-lg text-gray-600">
-                        5 guests - 2bedrooms - 2 bathrooms
+                        {property.guests} guests - {property.bedrooms} bedrooms - {property.bathrooms} bathrooms
                     </span>
 
                     <hr />
 
-                    <Image
-                        src={beach}
-                        width={50}
-                        height={50}
-                        className="rounded-full"
-                        alt="The user name"
-                    />
+                    <Link 
+                        href={`/landlords/${property.landlord.id}`}
+                        className="py-6 flex items-center space-x-4"
+                    >
+                        {property.landlord.avatar_url && (
+                            <Image
+                                src={property.landlord.avatar_url}
+                                width={50}
+                                height={50}
+                                className="rounded-full"
+                                alt="The user name"
+                            />
+                        )}
 
-
-                    <p><strong>Landlord name</strong> is your host</p>
-
+                        <p><strong>{property.landlord.name}</strong> is your host</p>
+                    </Link>
 
                     <hr />
 
                     <p className="mt-6 text-lg">
-                        Property description will go here.
+                        {property.description}
                     </p>
                 </div>
 
-                <ReservationSidebar />
+                <ReservationSidebar 
+                    property={property}
+                    userId={userId}
+                />
             </div>
         </main>
     )

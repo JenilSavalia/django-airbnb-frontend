@@ -1,49 +1,77 @@
-'use client'
+'use client';
 
-import CustomButton from "../forms/CustomButton";
 import Modal from "./modals";
+
+import { useState } from "react";
+import { useRouter } from 'next/navigation';
 import useLoginModal from "@/app/hooks/useLoginModal";
+import CustomButton from "../forms/CustomButton";
+import { handleLogin } from "../../lib/action";
+import apiService from "@/app/services/apiService";
 
 const LoginModal = () => {
+    const router = useRouter()
+    const loginModal = useLoginModal()
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState<string[]>([]);
 
-    const loginModal = useLoginModal();
+    const submitLogin = async () => {
+        const formData = {
+            email: email,
+            password: password
+        }
+
+        const response = await apiService.postWithoutToken('/api/auth/login/', JSON.stringify(formData))
+
+        if (response.access) {
+            handleLogin(response.user.pk, response.access, response.refresh);
+
+            loginModal.close();
+
+            router.push('/')
+        } else {
+            setErrors(response.non_field_errors);
+        }
+    }
 
     const content = (
         <>
-            <div className=" ">
-                <p className="text-sm text-center text-gray-500">Welcome back! Please enter your details.</p>
-                <form action="" className="">
-                    <input type="text" placeholder="Email" className="m-2 border border-gray-300 rounded-md p-2 w-full" />
-                    <input type="password" placeholder="Password" className="m-2 border border-gray-300 rounded-md p-2 w-full" />
+            <form
+                action={submitLogin}
+                className="space-y-4"
+            >
+                <input onChange={(e) => setEmail(e.target.value)} placeholder="Your e-mail address" type="email" className="w-full h-[54px] px-4 border border-gray-300 rounded-xl" />
 
-                    <CustomButton
-                        label={"Login"}
-                        onClick={() => {
-                            loginModal.close();
-                        }}
+                <input onChange={(e) => setPassword(e.target.value)} placeholder="Your password" type="password" className="w-full h-[54px] px-4 border border-gray-300 rounded-xl" />
 
-                    />
+                {errors.map((error, index) => {
+                    return (
+                        <div
+                            key={`error_${index}`}
+                            className="p-5 bg-airbnb text-white rounded-xl opacity-80"
+                        >
+                            {error}
+                        </div>
+                    )
+                })}
 
-                </form>
-            </div>
-
-
+                <CustomButton
+                    label="Submit"
+                    onClick={submitLogin}
+                />
+            </form>
         </>
-
-
     )
 
     return (
-        <>
-            <Modal
-                label={"Login"}
-                close={loginModal.close}
-                content={content}
-                isOpen={loginModal.isOpen}
-            />
-        </>
+        <Modal
+            isOpen={loginModal.isOpen}
+            close={loginModal.close}
+            label="Log in"
+            content={content}
+        />
     )
-
 }
 
-export default LoginModal
+export default LoginModal;
