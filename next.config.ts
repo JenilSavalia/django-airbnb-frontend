@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "https://django-airbnb-backend.vercel.app", // Replace with your Django backend domain
+        hostname: "https://django-airbnb-backend.vercel.app/", // Replace with your Django backend domain
         pathname: "/**",
       },
     ],
