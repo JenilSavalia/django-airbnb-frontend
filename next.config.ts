@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-
   images: {
     dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     remotePatterns: [
@@ -14,7 +12,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "https://django-airbnb-backend.vercel.app/", // Replace with your Django backend domain
+        hostname: "django-airbnb-backend.vercel.app",
         pathname: "/**",
       },
     ],
