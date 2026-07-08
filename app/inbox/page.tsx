@@ -1,5 +1,5 @@
 
-import { getUserId } from "../lib//action";
+import { getUserId } from "../lib/action";
 import apiService from "../services/apiService";
 import Conversation from "../components/inbox/Conversation";
 
